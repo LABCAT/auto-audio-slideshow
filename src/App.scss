@@ -1,0 +1,37 @@
+.app {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: var(--color-background);
+
+  &__container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  &__dropzone {
+    margin-top: 40px;
+    padding: 40px;
+    border: 2px dashed var(--color-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+
+    &:hover,
+    &--active {
+      border-color: var(--color-border-hover);
+    }
+
+    p {
+      margin-bottom: 8px;
+    }
+  }
+
+  &__dropzone-formats {
+    color: var(--color-text-secondary);
+    font-size: 1.4rem;
+  }
+}
