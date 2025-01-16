@@ -1,64 +1,69 @@
-import { useCallback, useState } from 'react';
-import { useDropzone, FileRejection, DropEvent } from 'react-dropzone';
+import { useState } from 'react';
+import { AudioUpload } from '@/components/Steps/AudioUpload/AudioUpload';
+import { NavStepper } from '@/components//NavStepper/NavStepper';
+import { AppState, AppStep } from './types/types';
 import "./styles/main.scss";
 import "./App.scss";
 
 function App() {
-  const [error, setError] = useState('');
-  const [currentFile, setCurrentFile] = useState<File | null>(null);
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setError('');  // Clear any existing errors
-    const file = acceptedFiles[0];
-
-    if (file) {
-      setCurrentFile(file);
-    }
-  }, []);
-
-  const onDropRejected = useCallback((fileRejections: FileRejection[]) => {
-    const rejection = fileRejections[0];
-    if (rejection.errors[0].code === 'file-invalid-type') {
-      setError('Invalid file type. Only MP3 and OGG files are allowed.');
-    }
-    setCurrentFile(null);  
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    onDropRejected,
-    accept: {
-      'audio/mpeg': ['.mp3'],
-      'audio/ogg': ['.ogg', '.oga']
-    },
-    maxFiles: 1,
-    multiple: false
+  const [state, setState] = useState<AppState>({
+    audioFile: null,
+    images: [],
+    currentStep: AppStep.AUDIO_UPLOAD
   });
+
+  const handleAudioSelect = (file: File) => {
+    setState(prev => ({
+      ...prev,
+      audioFile: { file }
+    }));
+  };
+
+  const handleNextStep = () => {
+    setState(prev => {
+      const nextStep = prev.currentStep + 1;
+      return {
+        ...prev,
+        currentStep: nextStep
+      };
+    });
+  };
+
+  const canProgressToNextStep = () => {
+    switch (state.currentStep) {
+      case AppStep.AUDIO_UPLOAD:
+        return !!state.audioFile;
+      case AppStep.BPM_ANALYSIS:
+        // Add logic for BPM analysis completion if needed
+        return true;
+      case AppStep.IMAGE_UPLOAD:
+        return state.images.length > 0;
+      case AppStep.PREVIEW:
+        return false;
+      default:
+        return false;
+    }
+  };
 
   return (
     <div className="app">
       <div className="app__container">
         <h1>Auto Audio Slideshow</h1>
         <p>Create audio synchronized slideshows from your photos</p>
-        <div
-          {...getRootProps()}
-          className={`app__dropzone ${isDragActive ? 'app__dropzone--active' : ''}`}
-        >
-          <input {...getInputProps()} />
-          {currentFile ? (
-            <div className="app__selected">
-              <svg className="app__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 18V5l12-2v13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="6" cy="18" r="3" stroke="currentColor" strokeWidth="2"/>
-                <circle cx="18" cy="16" r="3" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-              <p className="app__filename"> {currentFile.name}</p>
-            </div>
-            ) : (
-            <p>Drop your audio file here or click to select</p>
-          )}
-          {error && <p className="app__error">{error}</p>}
-        </div>
+
+        <NavStepper 
+          currentStep={state.currentStep}
+          canProgress={canProgressToNextStep()}
+          onNext={handleNextStep}
+        />
+
+        {state.currentStep === AppStep.AUDIO_UPLOAD && (
+          <AudioUpload
+            onAudioSelect={handleAudioSelect}
+            currentFile={state.audioFile?.file || null}
+          />
+        )}
+        {/* Add other step components here as needed */}
       </div>
     </div>
   );
