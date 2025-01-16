@@ -5,13 +5,13 @@
   min-height: 100vh;
   padding: 20px;
   background-color: var(--color-background);
-
+ 
   &__container {
     max-width: 600px;
     margin: 0 auto;
     text-align: center;
   }
-
+ 
   &__dropzone {
     margin-top: 40px;
     padding: 40px;
@@ -19,19 +19,32 @@
     border-radius: 8px;
     cursor: pointer;
     transition: border-color 0.3s ease;
-
+ 
     &:hover,
     &--active {
       border-color: var(--color-border-hover);
     }
-
-    p {
-      margin-bottom: 8px;
-    }
   }
-
-  &__dropzone-formats {
-    color: var(--color-text-secondary);
+ 
+  &__error {
+    color: var(--color-text-error);
+    font-size: 1.4rem;
+    margin-top: 8px;
+  }
+ 
+  &__selected {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+  }
+ 
+  &__icon {
+    flex-shrink: 0;
+  }
+ 
+  &__filename {
+    word-break: break-all;
     font-size: 1.4rem;
   }
-}
+ }
